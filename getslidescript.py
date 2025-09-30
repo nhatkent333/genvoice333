@@ -1,5 +1,3 @@
-# getslidescript.py
-
 from googleapiclient.discovery import build
 
 def get_slide_notes(service, presentation_id):
@@ -37,6 +35,7 @@ def export_to_txt(notes, output_path):
     """Xuất danh sách ghi chú ra TXT, mỗi ghi chú 1 dòng."""
     with open(output_path, "w", encoding="utf-8") as f:
         for note in notes:
-            f.write(note.strip() + "\n")
+            if note.strip():  # chỉ ghi nếu không rỗng
+                f.write(note.strip() + "\n")
 
     print(f"✅ Notes exported to {output_path}")
