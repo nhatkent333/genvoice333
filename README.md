@@ -1,3 +1,4 @@
+```
 # 📌 Cell chạy GenVoice Colab với lựa chọn giọng đọc
 
 # 1. Clone repo
@@ -20,3 +21,4 @@ VOICE_NAME = "Aoede"  # 👉 đổi sang Kore, Charon, Fenrir...
 
 # 5. Kiểm tra file mp3 đã tạo
 !ls -lh content/genvoice/
+```
