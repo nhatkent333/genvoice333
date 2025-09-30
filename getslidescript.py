@@ -1,20 +1,20 @@
 import argparse
-import requests
-import sys
 import os
 
-def extract_notes(slide_id, api_key, output_path):
-    url = f"https://slides.googleapis.com/v1/presentations/{slide_id}?key={api_key}"
+from google.colab import auth
+from googleapiclient.discovery import build
 
-    try:
-        resp = requests.get(url)
-        resp.raise_for_status()
-        presentation = resp.json()
-    except Exception as e:
-        print(f"[ERROR] Không thể gọi API: {e}")
-        sys.exit(1)
+def extract_notes_oauth(slide_id, output_path="script.txt"):
+    # Xác thực bằng popup login
+    auth.authenticate_user()
 
+    # Tạo service Slides API
+    service = build("slides", "v1")
+
+    # Gọi API lấy presentation
+    presentation = service.presentations().get(presentationId=slide_id).execute()
     slides = presentation.get("slides", [])
+
     notes_list = []
 
     for idx, slide in enumerate(slides, start=1):
@@ -41,11 +41,10 @@ def extract_notes(slide_id, api_key, output_path):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extract speaker notes from Google Slides")
+    parser = argparse.ArgumentParser(description="Extract speaker notes from Google Slides (OAuth version)")
     parser.add_argument("--slide_id", required=True, help="Google Slide ID")
-    parser.add_argument("--api_key", required=True, help="Google Slides API key")
-    parser.add_argument("--output", required=True, help="Output file path (script.txt)")
+    parser.add_argument("--output", default="script.txt", help="Output file path")
 
     args = parser.parse_args()
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    extract_notes(args.slide_id, args.api_key, args.output)
+    extract_notes_oauth(args.slide_id, args.output)
