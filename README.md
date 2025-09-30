@@ -1,19 +1,13 @@
 ```
 # 📌 Cell chạy GenVoice Colab với lựa chọn giọng đọc
 
-# 1. Clone repo
+# 1. Tạo file apikey.txt
+
+# 2. Tạo file script.txt
+
+# 3. Clone repo
 !git clone https://github.com/nhatkent333/genvoice333.git
 %cd genvoice333
-
-# 2. Tạo file apikey.txt (thay bằng API key thật)
-with open("apikey.txt", "w") as f:
-    f.write("YOUR_API_KEY_HERE\n")
-
-# 3. Tạo file script.txt
-with open("script.txt", "w", encoding="utf-8") as f:
-    f.write("Xin chào, đây là đoạn voice đầu tiên.\n")
-    f.write("Đây là đoạn voice thứ hai.\n")
-    f.write("Và đây là đoạn thứ ba.\n")
 
 # 4. Chọn giọng đọc và chạy script
 VOICE_NAME = "Aoede"  # 👉 đổi sang Kore, Charon, Fenrir...
