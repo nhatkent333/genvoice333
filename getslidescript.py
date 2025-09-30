@@ -1,8 +1,9 @@
 import argparse
 import requests
 import sys
+import os
 
-def extract_notes(slide_id, api_key, output_path="script.txt"):
+def extract_notes(slide_id, api_key, output_path):
     url = f"https://slides.googleapis.com/v1/presentations/{slide_id}?key={api_key}"
 
     try:
@@ -18,7 +19,6 @@ def extract_notes(slide_id, api_key, output_path="script.txt"):
 
     for idx, slide in enumerate(slides, start=1):
         notes = ""
-        page_elements = slide.get("slideProperties", {})
         notes_page = slide.get("slideProperties", {}).get("notesPage")
 
         if notes_page:
@@ -44,7 +44,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract speaker notes from Google Slides")
     parser.add_argument("--slide_id", required=True, help="Google Slide ID")
     parser.add_argument("--api_key", required=True, help="Google Slides API key")
-    parser.add_argument("--output", default="script.txt", help="Output file path")
+    parser.add_argument("--output", required=True, help="Output file path (script.txt)")
 
     args = parser.parse_args()
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     extract_notes(args.slide_id, args.api_key, args.output)
