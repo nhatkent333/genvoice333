@@ -2,7 +2,7 @@
 # 📌 Cell chạy GenVoice Colab với lựa chọn giọng đọc
 
 # 1. Clone repo
-!git clone https://github.com/yourname/genvoice-colab.git
+!git clone https://github.com/nhatkent333/genvoice333
 %cd genvoice-colab
 
 # 2. Tạo file apikey.txt (thay bằng API key thật)
