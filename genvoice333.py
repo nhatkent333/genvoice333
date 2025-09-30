@@ -7,8 +7,8 @@ from google import genai
 from google.genai import types
 
 # ==== ĐƯỜNG DẪN CẤU HÌNH ====
-API_KEY_PATH = "apikey.txt"
-SCRIPT_PATH = "script.txt"
+API_KEY_PATH = "content/apikey.txt"
+SCRIPT_PATH = "content/script.txt"
 VOICE_OUTPUT_DIR = "content/genvoice"
 
 # ==== HÀM XỬ LÝ ====
