@@ -17,7 +17,7 @@ with open("script.txt", "w", encoding="utf-8") as f:
 
 # 4. Chọn giọng đọc và chạy script
 VOICE_NAME = "Aoede"  # 👉 đổi sang Kore, Charon, Fenrir...
-!python genvoice.py --voice $VOICE_NAME
+!python genvoice333.py --voice $VOICE_NAME
 
 # 5. Kiểm tra file mp3 đã tạo
 !ls -lh content/genvoice/
