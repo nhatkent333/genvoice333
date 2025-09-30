@@ -1,41 +1,36 @@
 import os
 import argparse
-from google.colab import auth
 from googleapiclient.discovery import build
-
+import requests
 
 def export_slides_to_png(slide_id, output_dir):
-    """Xuất từng slide thành PNG và lưu vào output_dir."""
-    # Xác thực tài khoản Google
-    try:
-        auth.authenticate_user()
-    except Exception:
-        print("⚠️ Không chạy trên Colab, bỏ qua bước auth")
-
+    """Xuất từng slide trong Google Slides thành PNG."""
     service = build("slides", "v1")
-    drive_service = build("drive", "v3")
 
-    # Lấy thông tin trình chiếu
+    # Lấy thông tin presentation
     presentation = service.presentations().get(presentationId=slide_id).execute()
-    slide_count = len(presentation.get("slides", []))
-
-    # Tạo thư mục nếu chưa có
+    slides = presentation.get("slides", [])
     os.makedirs(output_dir, exist_ok=True)
 
-    print(f"📑 Tổng số slide: {slide_count}")
-    for i in range(slide_count):
-        page_object_id = presentation["slides"][i]["objectId"]
+    print(f"📑 Tổng số slide: {len(slides)}")
 
-        # Xuất slide sang PNG (sử dụng Drive API export)
-        request = drive_service.files().export_media(
-            fileId=slide_id,
-            mimeType="image/png"
-        )
+    for i, slide in enumerate(slides, start=1):
+        page_id = slide.get("objectId")
 
-        # Lưu file
-        file_path = os.path.join(output_dir, f"slide_{i+1}.png")
+        # Lấy thumbnail của từng slide
+        thumbnail = service.presentations().pages().getThumbnail(
+            presentationId=slide_id,
+            pageObjectId=page_id,
+            thumbnailProperties_thumbnailSize="LARGE"
+        ).execute()
+
+        content_url = thumbnail.get("contentUrl")
+
+        # Tải về PNG
+        file_path = os.path.join(output_dir, f"slide_{i}.png")
+        r = requests.get(content_url)
         with open(file_path, "wb") as f:
-            f.write(request.execute())
+            f.write(r.content)
 
         print(f"✅ Saved {file_path}")
 
@@ -43,7 +38,7 @@ def export_slides_to_png(slide_id, output_dir):
 def main():
     parser = argparse.ArgumentParser(description="Export Google Slides to PNG")
     parser.add_argument("--slide_id", required=True, help="Google Slide ID")
-    parser.add_argument("--output_dir", default="/content/pngslide", help="Output folder for PNG files")
+    parser.add_argument("--output_dir", default="/content/pngslide", help="Output folder")
     args = parser.parse_args()
 
     export_slides_to_png(args.slide_id, args.output_dir)
