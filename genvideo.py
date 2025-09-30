@@ -6,13 +6,13 @@ from moviepy.editor import (
     CompositeAudioClip, concatenate_audioclips
 )
 
-def make_slide_in(img_path, duration, audio, direction="left", transition=1):
+def make_slide_in(img_path, duration, direction="left", transition=1):
     """
     Tạo hiệu ứng slide in cho ảnh tĩnh.
     direction: "left", "right", "top", "bottom"
     transition: thời gian hiệu ứng (giây)
     """
-    clip = ImageClip(img_path).set_duration(duration).set_audio(audio)
+    clip = ImageClip(img_path).set_duration(duration)
     w, h = clip.size
 
     if direction == "left":
@@ -26,7 +26,6 @@ def make_slide_in(img_path, duration, audio, direction="left", transition=1):
     else:
         start_pos, end_pos = (0, 0), (0, 0)
 
-    # Hàm position theo thời gian
     clip = clip.set_position(lambda t: (
         start_pos[0] + (end_pos[0] - start_pos[0]) * min(1, t/transition),
         start_pos[1] + (end_pos[1] - start_pos[1]) * min(1, t/transition)
@@ -35,6 +34,7 @@ def make_slide_in(img_path, duration, audio, direction="left", transition=1):
     return clip
 
 def generate_video(images_dir, voices_dir, bg_music_path, output_path):
+    # Lấy danh sách ảnh & voice, sort theo số thứ tự
     images = sorted([f for f in os.listdir(images_dir) if f.endswith(".png")],
                     key=lambda x: int(x.split("_")[1].split(".")[0]))
     voices = sorted([f for f in os.listdir(voices_dir) if f.endswith(".mp3")],
@@ -49,17 +49,18 @@ def generate_video(images_dir, voices_dir, bg_music_path, output_path):
         voice_durations.append(voice_clip.duration)
 
         if idx % 2 == 1:
-            img_clip = make_slide_in(os.path.join(images_dir, img), voice_clip.duration, voice_clip, "left")
+            img_clip = make_slide_in(os.path.join(images_dir, img), voice_clip.duration, "left")
         else:
-            img_clip = make_slide_in(os.path.join(images_dir, img), voice_clip.duration, voice_clip, "top")
+            img_clip = make_slide_in(os.path.join(images_dir, img), voice_clip.duration, "top")
 
         video_clips.append(img_clip)
         voice_clips.append(voice_clip)
 
+    # Nối video
     final_video = concatenate_videoclips(video_clips, method="compose")
 
-    # Track voice
-    voice_track = CompositeAudioClip(voice_clips)
+    # Nối voice track khớp từng slide
+    voice_track = concatenate_audioclips(voice_clips)
 
     # Nhạc nền
     total_duration = sum(voice_durations)
@@ -72,7 +73,7 @@ def generate_video(images_dir, voices_dir, bg_music_path, output_path):
     else:
         bg_music = bg_music.subclip(0, total_duration)
 
-    # Mix audio
+    # Mix audio (voice + bg)
     final_audio = CompositeAudioClip([voice_track, bg_music.volumex(0.3)])
     final_video = final_video.set_audio(final_audio)
 
